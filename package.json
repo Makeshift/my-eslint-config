@@ -1,7 +1,6 @@
 {
   "name": "@makeshift27015/eslint-config",
   "module": "index.ts",
-  "dependencies": {},
   "optionalDependencies": {
     "@nx/eslint-plugin": "^21.3.11"
   },
