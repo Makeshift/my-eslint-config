@@ -1,6 +1,7 @@
 import stylistic from '@stylistic/eslint-plugin'
 import parser from '@typescript-eslint/parser'
 import love from 'eslint-config-love'
+import { importX } from 'eslint-plugin-import-x'
 import jsdoc from 'eslint-plugin-jsdoc'
 import jsoncPlugin from 'eslint-plugin-jsonc'
 import fixUnusedImports from 'eslint-plugin-unused-imports'
@@ -13,6 +14,10 @@ export enum Extras {
    * Enable Nx from @nx/eslint-plugin
    */
   Nx,
+  /**
+   * Enable the Pulumi plugin from @pulumi/eslint-plugin
+   */
+  Pulumi,
 }
 
 export interface Config extends tseslint.ConfigWithExtends {
@@ -119,6 +124,10 @@ const tsCommon: tseslint.ConfigWithExtends = {
     '@typescript-eslint/class-methods-use-this': 'off',
 
     ...stylistic.configs['disable-legacy'].rules,
+
+    '@typescript-eslint/require-await': 'off',
+    'import-x/no-nodejs-modules': 'off',
+    'no-param-reassign': 'off',
   },
 }
 
@@ -161,6 +170,26 @@ export default async function (config?: Config) {
       config ?? {},
       // stylistic
       stylistic.configs['disable-legacy'],
+      // import-x
+      {
+        plugins: {
+          'import-x': importX,
+        },
+        languageOptions: {
+          ecmaVersion: 'latest',
+          sourceType: 'module',
+        },
+        rules: {
+          'import-x/no-dynamic-require': 'off',
+          'import-x/no-nodejs-modules': 'off',
+        },
+      },
+      // Pulumi
+      (config?.extras?.includes(Extras.Pulumi)
+        ? {
+            plugins: await import('@pulumi/eslint-plugin'),
+          }
+        : {}),
     ],
   })
 }
