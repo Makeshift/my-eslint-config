@@ -7,7 +7,10 @@ jobs:
     if: github.ref_name == 'main'
     steps:
       - uses: actions/checkout@v6
-
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          
       - uses: oven-sh/setup-bun@v2
 
       - name: Do bump
