@@ -6,7 +6,8 @@ on:
 permissions:
   actions: write
   contents: write
-    
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -51,3 +52,9 @@ jobs:
           branch: ${{ github.head_ref || github.ref_name }}
           tags: true
           force: true
+
+      - name: Publish
+        run: |
+          # Bun doesn't support npm trusted publishing yet
+          bun pm pack
+          npm publish *.tgz
