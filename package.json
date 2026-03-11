@@ -1,6 +1,9 @@
 {
   "name": "@makeshift27015/eslint-config",
-  "repository.url": "https://github.com/Makeshift/my-eslint-config",
+  "repository": {
+    "url": "https://github.com/Makeshift/my-eslint-config",
+    "type": "git"
+  },
   "version": "1.3.2",
   "module": "index.ts",
   "optionalDependencies": {
