@@ -13,6 +13,8 @@ jobs:
           
       - uses: oven-sh/setup-bun@v2
 
+      - uses: actions4git/setup-git@v1
+      
       - name: Do bump
         id: bump
         run: |
