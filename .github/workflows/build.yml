@@ -54,8 +54,15 @@ jobs:
       #     branch: ${{ github.head_ref || github.ref_name }}
       #     tags: true
       #     force: true
-
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          
       - name: Publish
         run: |
           # Bun doesn't support npm trusted publishing yet
+          npm --version
+          npm install
           npm publish --access public
