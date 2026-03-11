@@ -21,39 +21,39 @@ jobs:
           
       - uses: oven-sh/setup-bun@v2
 
-      # - uses: actions4git/setup-git@v1
+      - uses: actions4git/setup-git@v1
       
-      # - name: Do bump
-      #   id: bump
-      #   run: |
-      #     last_tag="$(git describe --tags "$(git rev-list --tags --max-count=1)")"
-      #     commit_messages="$(git log --pretty=format:'%s' "$last_tag"..HEAD | tr '[:upper:]' '[:lower:]')"
-      #     bump_type="patch"
-      #     if [[ $commit_messages == *"minor"* ]]; then
-      #       bump_type="minor"
-      #     fi
-      #     if [[ $commit_messages == *"major"* ]]; then
-      #       bump_type="major"
-      #     fi
+      - name: Do bump
+        id: bump
+        run: |
+          last_tag="$(git describe --tags "$(git rev-list --tags --max-count=1)")"
+          commit_messages="$(git log --pretty=format:'%s' "$last_tag"..HEAD | tr '[:upper:]' '[:lower:]')"
+          bump_type="patch"
+          if [[ $commit_messages == *"minor"* ]]; then
+            bump_type="minor"
+          fi
+          if [[ $commit_messages == *"major"* ]]; then
+            bump_type="major"
+          fi
 
-      #     python -m pip install --upgrade bump-my-version
-      #     bump-my-version bump "$bump_type" -vv
-      #     version=$(bump-my-version show current_version)
-      #     echo "version=${version}" >> "$GITHUB_OUTPUT"
-      #     echo "tag=v${version}" >> "$GITHUB_OUTPUT"
+          python -m pip install --upgrade bump-my-version
+          bump-my-version bump "$bump_type" -vv
+          version=$(bump-my-version show current_version)
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${version}" >> "$GITHUB_OUTPUT"
 
-      # - name: Commit & amend changes
-      #   run: |
-      #     git add .
-      #     git commit -a --amend --no-edit
-      #     git tag -f "${{ steps.bump.outputs.tag }}"
+      - name: Commit & amend changes
+        run: |
+          git add .
+          git commit -a --amend --no-edit
+          git tag -f "${{ steps.bump.outputs.tag }}"
 
-      # - name: Push changes
-      #   uses: ad-m/github-push-action@v0.8.0
-      #   with:
-      #     branch: ${{ github.head_ref || github.ref_name }}
-      #     tags: true
-      #     force: true
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          branch: ${{ github.head_ref || github.ref_name }}
+          tags: true
+          force: true
       
       - uses: actions/setup-node@v4
         with:
