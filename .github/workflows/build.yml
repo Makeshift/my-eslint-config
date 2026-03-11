@@ -11,6 +11,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_PROVENANCE: true
     steps:
       - uses: actions/checkout@v6
         with:
@@ -57,4 +59,4 @@ jobs:
         run: |
           # Bun doesn't support npm trusted publishing yet
           bun pm pack
-          npm publish *.tgz
+          npm publish *.tgz --access public --provenance
