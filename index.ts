@@ -1,13 +1,12 @@
+import type { ConfigWithExtendsArray, Config as EslintConfig, ExtendsElement } from '@eslint/config-helpers'
 import stylistic from '@stylistic/eslint-plugin'
 import parser from '@typescript-eslint/parser'
 import love from 'eslint-config-love'
 import { importX } from 'eslint-plugin-import-x'
 import jsdoc from 'eslint-plugin-jsdoc'
-import jsoncPlugin from 'eslint-plugin-jsonc'
 import fixUnusedImports from 'eslint-plugin-unused-imports'
+import { defineConfig } from 'eslint/config'
 import globals from 'globals'
-import jsoncParser from 'jsonc-eslint-parser'
-import * as tseslint from 'typescript-eslint'
 
 export enum Extras {
   /**
@@ -20,14 +19,14 @@ export enum Extras {
   Pulumi,
 }
 
-export interface Config extends tseslint.ConfigWithExtends {
+export interface Config extends ConfigWithExtendsArray {
   /**
    * Additional plugins or configs to include
    */
   extras?: Extras[]
 }
 
-const tsCommon: tseslint.ConfigWithExtends = {
+export const tsCommon: EslintConfig = {
   files: ['**/*.ts', '**/*.tsx'],
   ignores: ['**/node_modules/**', '**/*.d.ts', '**/cdk.out', '**/dist', '**/.nx'],
   languageOptions: {
@@ -112,7 +111,6 @@ const tsCommon: tseslint.ConfigWithExtends = {
     '@typescript-eslint/no-base-to-string': 'off', // used quite often in Pulumi code
 
     // Comments and documentation
-    'eslint-comments/require-description': ['warn', { ignore: ['eslint-enable'] }],
     '@typescript-eslint/ban-ts-comment': 'off',
 
     // Stylistic rules (handled by other tools)
@@ -134,62 +132,65 @@ const tsCommon: tseslint.ConfigWithExtends = {
 /**
  *
  * @param config
+ * @param mergeWithDefaults
  */
-export default async function (config?: Config) {
-  return tseslint.config({
+export default function (config?: Config, mergeWithDefaults = true) {
+  const extendables: ExtendsElement[] = [
+    stylistic.configs.recommended,
+    jsdoc.configs['flat/recommended-typescript'],
+    love,
+    {
+      plugins: {
+        fixUnusedImports,
+      },
+    },
+    // comments.recommended,
+    stylistic.configs['disable-legacy'],
+    {
+      plugins: {
+        'import-x': importX,
+      },
+      languageOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      rules: {
+        'import-x/no-dynamic-require': 'off',
+        'import-x/no-nodejs-modules': 'off',
+      },
+    },
+  ]
+
+  // if (config?.extras?.includes(Extras.Nx)) {
+  //   extendables.push({
+  //     languageOptions: {
+  //       parser: jsoncParser,
+  //     },
+  //     plugins: {
+  //       jsonc: jsoncPlugin,
+  //     },
+  //   }, nxPlugin.configs['flat/typescript'])
+  // }
+
+  // if (config?.extras?.includes(Extras.Pulumi)) {
+  //   extendables.push({
+  //     plugins: pulumiPlugin,
+  //   })
+  // }
+
+  // if (config) {
+  //   delete config.extras
+  //   extendables.push(config)
+  // }
+
+  // if (!mergeWithDefaults) {
+  //   return defineConfig({
+  //     extends: extendables
+  //   })
+  // }
+
+  return defineConfig({
     ...tsCommon,
-    extends: [
-      {
-        plugins: {
-          '@stylistic': stylistic,
-        },
-      },
-      stylistic.configs.recommended,
-      // jsdoc
-      jsdoc.configs['flat/recommended-typescript'],
-      // love
-      love,
-      // fix unused imports
-      {
-        plugins: {
-          fixUnusedImports,
-        },
-      },
-      // nx
-      (config?.extras?.includes(Extras.Nx)
-        ? {
-            languageOptions: {
-              parser: jsoncParser,
-            },
-            plugins: {
-              jsonc: jsoncPlugin,
-              nx: await import('@nx/eslint-plugin'),
-            },
-          }
-        : {}),
-      config ?? {},
-      // stylistic
-      stylistic.configs['disable-legacy'],
-      // import-x
-      {
-        plugins: {
-          'import-x': importX,
-        },
-        languageOptions: {
-          ecmaVersion: 'latest',
-          sourceType: 'module',
-        },
-        rules: {
-          'import-x/no-dynamic-require': 'off',
-          'import-x/no-nodejs-modules': 'off',
-        },
-      },
-      // Pulumi
-      (config?.extras?.includes(Extras.Pulumi)
-        ? {
-            plugins: await import('@pulumi/eslint-plugin'),
-          }
-        : {}),
-    ],
+    extends: extendables,
   })
 }
