@@ -1,4 +1,4 @@
-import type { ConfigWithExtendsArray, Config as EslintConfig, ExtendsElement } from '@eslint/config-helpers'
+import type { ConfigWithExtends, Config as EslintConfig, ExtendsElement } from '@eslint/config-helpers'
 import stylistic from '@stylistic/eslint-plugin'
 import parser from '@typescript-eslint/parser'
 import love from 'eslint-config-love'
@@ -19,7 +19,7 @@ export enum Extras {
   Pulumi,
 }
 
-export interface Config extends ConfigWithExtendsArray {
+export interface Config extends ConfigWithExtends {
   /**
    * Additional plugins or configs to include
    */
