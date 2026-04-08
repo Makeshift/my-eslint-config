@@ -4,7 +4,7 @@
     "url": "https://github.com/Makeshift/my-eslint-config",
     "type": "git"
   },
-  "version": "1.4.0",
+  "version": "1.4.1",
   "module": "index.ts",
   "dependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
