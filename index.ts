@@ -8,37 +8,52 @@ import fixUnusedImports from 'eslint-plugin-unused-imports'
 import { defineConfig } from 'eslint/config'
 import globals from 'globals'
 
-export interface Config {
-  /** Global ignore patterns */
+export interface Config extends EslintConfig {
+  /**
+   * Globs to add to the ignore list
+   * Merged into {@link defaultIgnores}
+   */
   ignores?: string[]
-  /** Root directory for tsconfig resolution (passed to parserOptions.tsconfigRootDir) */
-  tsconfigRootDir?: string
-  /** Additional rule overrides, merged on top of defaults */
+  /**
+   * Root directory for tsconfig files.
+   * If tsconfig is in the same directory as your eslint config,
+   * this should be set to `dirname(fileURLToPath(import.meta.url))`
+   */
+  tsconfigRootDir: string
+  /**
+   * Rules to override.
+   * Merged into {@link defaultRules}
+   */
   rules?: EslintConfig['rules']
-  /** File patterns to lint (default: ts and tsx) */
+  /**
+   * Globs of files to lint.
+   * Defaults to '*.ts' and '*.tsx' recursively.
+   * If provided, will override the default.
+   */
   files?: string[]
   /**
-   * Tsconfig project setting for type-aware linting.
-   * - `true` (default): resolve nearest tsconfig per file
-   * - string or string[]: explicit tsconfig path(s), e.g. `'./tsconfig.eslint.json'`
-   *
-   * For large monorepos, pointing to a single tsconfig.eslint.json that
-   * includes all linted files avoids creating one TS program per sub-project.
+   * Additional files that are not specified in tsconfig that should still be
+   * included in type-aware linting.
+   * Merged into {@link defaultAllowDefaultProject}
    */
-  project?: string | string[] | true
+  allowDefaultProject?: string[]
 }
 
+export const defaultAllowDefaultProject = ['eslint.config.ts', '*.config.ts', '*.config.mts']
+
 /** Default global ignore patterns */
-const defaultIgnores = [
+export const defaultIgnores = [
   '**/node_modules/**',
   '**/*.d.ts',
   '**/cdk.out/**',
   '**/dist/**',
   '**/.nx/**',
+  '**/.yarn/**',
+  '**/*.tsbuildinfo',
 ]
 
 /** Default rules applied to all TS files */
-const defaultRules: EslintConfig['rules'] = {
+export const defaultRules: EslintConfig['rules'] = {
   '@typescript-eslint/max-params': 'off',
   '@typescript-eslint/init-declarations': 'off',
 
@@ -53,6 +68,7 @@ const defaultRules: EslintConfig['rules'] = {
   '@stylistic/complexity': 'off',
   '@stylistic/max-params': 'off',
   'max-lines': 'off',
+  'no-plusplus': 'off',
 
   // Magic numbers - can be re-enabled with allowlist
   '@stylistic/no-magic-numbers': 'off', // Let me put 0 in my code if I want to
@@ -127,7 +143,7 @@ const defaultRules: EslintConfig['rules'] = {
 }
 
 /** Shared plugin configs to extend from */
-const extendables: ExtendsElement[] = [
+export const extendables: ExtendsElement[] = [
   stylistic.configs.recommended,
   jsdoc.configs['flat/recommended-typescript'],
   love,
@@ -144,30 +160,21 @@ const extendables: ExtendsElement[] = [
 ]
 
 export default function (config?: Config): EslintConfig[] {
-  const globalIgnores: EslintConfig = {
-    ignores: [...defaultIgnores, ...(config?.ignores ?? [])],
-  }
-
-  const parserOptions: Record<string, unknown> = {
-    sourceType: 'module',
-    // eslint-config-love enables projectService which spins up a full TS Language
-    // Service instance per discovered tsconfig
-    // Override to use the lighter-weight `project` which resolves the
-    // nearest tsconfig per file without the full language service overhead
-    projectService: false,
-    project: config?.project ?? true,
-  }
-  if (config?.tsconfigRootDir) {
-    parserOptions.tsconfigRootDir = config.tsconfigRootDir
-  }
-
   return [
-    globalIgnores,
+    {
+      ignores: [...defaultIgnores, ...(config?.ignores ?? [])],
+    },
     ...defineConfig({
       files: config?.files ?? ['**/*.ts', '**/*.tsx'],
       languageOptions: {
         parser,
-        parserOptions,
+        parserOptions: {
+          sourceType: 'module',
+          projectService: {
+            allowDefaultProject: [...defaultAllowDefaultProject, ...(config?.allowDefaultProject ?? [])],
+          },
+          tsconfigRootDir: config?.tsconfigRootDir,
+        },
         globals: {
           ...globals.node,
           // @ts-expect-error We're using this to check if we're running in Bun
