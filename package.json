@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "typecheck": "bunx tsc --noEmit",
-    "build": "bunx tsc --project tsconfig.build.json",
+    "build": "bunx tsc",
     "prepack": "bun run build"
   },
   "dependencies": {
