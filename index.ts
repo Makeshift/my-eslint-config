@@ -146,7 +146,7 @@ export const defaultRules: EslintConfig['rules'] = {
 export const extendables: ExtendsElement[] = [
   stylistic.configs.recommended,
   jsdoc.configs['flat/recommended-typescript'],
-  love,
+  love as ExtendsElement,
   { plugins: { fixUnusedImports } },
   stylistic.configs['disable-legacy'],
   {
@@ -177,8 +177,7 @@ export default function (config?: Config): EslintConfig[] {
         },
         globals: {
           ...globals.node,
-          // @ts-expect-error We're using this to check if we're running in Bun
-          Bun: typeof Bun !== 'undefined',
+          Bun: 'Bun' in globalThis,
         },
       },
       rules: {

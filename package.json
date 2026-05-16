@@ -5,7 +5,25 @@
     "type": "git"
   },
   "version": "2.1.0",
-  "module": "index.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "typecheck": "bunx tsc --noEmit",
+    "build": "bunx tsc --project tsconfig.build.json",
+    "prepack": "bun run build"
+  },
   "dependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
     "@eslint/eslintrc": "^3.3.5",
