@@ -71,7 +71,7 @@ jobs:
           
       - name: Publish
         run: |
-          # Build with Bun, but publish with npm because Bun doesn't support trusted publishing yet.
+          # Rebuild fresh dist artifacts with Bun, then publish with npm because Bun doesn't support trusted publishing yet.
           npm --version
           bun run build
           npm publish --access public
