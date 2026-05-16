@@ -20,7 +20,7 @@
     "dist"
   ],
   "scripts": {
-    "typecheck": "bunx tsc --noEmit",
+    "typecheck": "bunx tsc --project tsconfig.typecheck.json",
     "build": "bunx tsc",
     "prepack": "bun run build"
   },
