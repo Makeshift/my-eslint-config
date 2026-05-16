@@ -11,8 +11,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_PROVENANCE: true
     steps:
       - uses: actions/checkout@v6
         with:
@@ -41,15 +39,6 @@ jobs:
 
           python -m pip install --upgrade bump-my-version
           bump-my-version bump "$bump_type" -vv
-          version=$(bump-my-version show current_version)
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-          echo "tag=v${version}" >> "$GITHUB_OUTPUT"
-
-      - name: Commit & amend changes
-        run: |
-          git add .
-          git commit -a --amend --no-edit
-          git tag -f "${{ steps.bump.outputs.tag }}"
 
       - name: Push changes
         uses: ad-m/github-push-action@v0.8.0
@@ -65,5 +54,5 @@ jobs:
           
       - name: Publish
         run: |
-          bun run build
-          npm publish --access public
+          bun pm pack
+          bunx npm publish --access public ./makeshift27015-eslint-config-*.tgz --provenance
