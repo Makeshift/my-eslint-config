@@ -73,4 +73,5 @@ jobs:
         run: |
           # Bun doesn't support npm trusted publishing yet
           npm --version
+          bun run build
           npm publish --access public
