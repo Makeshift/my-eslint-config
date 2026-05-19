@@ -4,7 +4,7 @@
     "url": "https://github.com/Makeshift/my-eslint-config",
     "type": "git"
   },
-  "version": "2.1.1",
+  "version": "2.1.2",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
