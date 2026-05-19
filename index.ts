@@ -139,6 +139,7 @@ export const defaultRules: EslintConfig['rules'] = {
 
   '@typescript-eslint/require-await': 'off',
   'import-x/no-nodejs-modules': 'off',
+  'import-x/no-cycle': 'error',
   'no-param-reassign': 'off',
 }
 
