@@ -141,6 +141,9 @@ export const defaultRules: EslintConfig['rules'] = {
   'import-x/no-nodejs-modules': 'off',
   'import-x/no-cycle': 'error',
   'no-param-reassign': 'off',
+  
+  // This is very unlikely to be a problem
+  '@typescript-eslint/require-array-sort-compare': 'error',
 }
 
 /** Shared plugin configs to extend from */
